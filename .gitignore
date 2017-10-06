@@ -1,3 +1,10 @@
+# Pesky OS metadata files that we don't need
+.DS_Store
+Thumbs.db
+
+# Hidden Vagrant folder
+.vagrant/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
