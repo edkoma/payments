@@ -12,7 +12,7 @@ DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 PORT = os.getenv('PORT', '5000')
 
 # init SQLAlchemy db
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/dev.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -33,11 +33,13 @@ class PaymentStatus(Enum):
     UNPAID = "unpaid"
     PROCESSING = "processing"
     PAID = "paid"
+    
 
 class PaymentMethodType(Enum):
     CREDIT = "credit"
     DEBIT = "debit"
     PAYPAL = "paypal"
+
 
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,7 +51,6 @@ class Payment(db.Model):
     
     def __repr__(self):
         return '<Payment %d>' % self.id
-
 
 
 class PaymentMethod(db.Model):
