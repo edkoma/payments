@@ -1,3 +1,5 @@
+
+
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -59,6 +61,15 @@ class PaymentMethod(db.Model):
 
     def __repr__(self):
         return '<PaymentMethod %d, type %r>' % (self.id, self.method_type)
+######################################################################
+# RETRIEVE A PAYMENT
+######################################################################
+@app.route('/payments/<int:id>', methods=['GET'])
+def get_payments(id):
+    payment = Payment.query.get(id)
+    if not payment:
+        raise NotFound("Payment with id '{}' was not found.".format(id))
+    return make_response(jsonify(payment.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # Main

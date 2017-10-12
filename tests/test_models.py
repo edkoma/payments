@@ -43,3 +43,15 @@ class TestPayments(unittest.TestCase):
         # This should be the only payment in the database, sqlite starts primary keys at 1
         p = Payment.query.get(1)
         self.assertEqual(p, payment)
+
+     def test_get_payment(self):
+        resp = self.app.get('/payments/2')
+        #print 'resp_data: ' + resp.data
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+        data = json.loads(resp.data)
+        self.assertEqual (data['user_id'], 'kitty')
+        self.assertEqual (data['order_id'], 'kitty')
+        self.assertEqual (data['status'], 'kitty')
+        self.assertEqual (data['method_id'], 'kitty')
+        self.assertEqual (data['method'], 'kitty')
+        
