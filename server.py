@@ -4,7 +4,6 @@ from flask import Flask, Response, jsonify, request, json, make_response, url_fo
 from flask_api import status
 from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
-from werkzeug.exceptions import NotFound
 
 
 ######################################################################
@@ -51,11 +50,6 @@ def request_validation_error(e):
 def not_found(e):
     return make_response(jsonify(status=404, error='Not Found', message=e.description), status.HTTP_404_NOT_FOUND)
 
-
-######################################################################
-# Models
-######################################################################
-
 ######################################################################
 # LIST ALL PAYMENTS
 ######################################################################
@@ -79,8 +73,6 @@ def list_payment_methods():
 @app.route('/payments/<int:id>', methods=['GET'])
 def get_payments(id):
     payment = Payment.find_or_404(id)
-    # if not payment:
-        # raise NotFound("Payment with id: '{}' was not found in the database.".format(id))
     return make_response(jsonify(payment.serialize()), status.HTTP_200_OK)
 
 ######################################################################

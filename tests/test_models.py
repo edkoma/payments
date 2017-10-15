@@ -5,7 +5,7 @@ from server import Payment, PaymentStatus, PaymentMethodType, PaymentMethod, app
 import logging
 
 
-class TestPayments(unittest.TestCase):
+class TestModels(unittest.TestCase):
 
     def setUp(self):
         # Only log criticl errors
