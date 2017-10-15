@@ -1,10 +1,10 @@
-
-
 import os
-from flask import Flask
+import logging
+from flask import Flask, Response, jsonify, request, json, make_response, url_for
+from flask_api import status
 from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
-from models import db
+
 
 ######################################################################
 # Init
@@ -18,6 +18,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/dev.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+db.create_all()
+
+######################################################################
+# Custom Exceptions
+######################################################################
+class DataValidationError(ValueError):
+    pass
+
+
+# This needs to be after db, classes, etc are initialized to avoid circular imports
+from models import *
 
 ######################################################################
 # Routes
@@ -28,52 +39,57 @@ def home():
     return "Payments Home Page"
 
 ######################################################################
-# Models
+# Error Handlers
 ######################################################################
-
-class PaymentStatus(Enum):
-    UNPAID = "unpaid"
-    PROCESSING = "processing"
-    PAID = "paid"
-    
-
-class PaymentMethodType(Enum):
-    CREDIT = "credit"
-    DEBIT = "debit"
-    PAYPAL = "paypal"
+@app.errorhandler(DataValidationError)
+def request_validation_error(e):
+    return make_response(jsonify(status=400, error='Bad Request', message=e.message), status.HTTP_400_BAD_REQUEST)
 
 
-class Payment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, nullable=False)
-    order_id = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.Enum(PaymentStatus))
-    method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'), nullable=False)
-    method = db.relationship('PaymentMethod', backref=db.backref('payments', lazy=True))
-    
-    def __repr__(self):
-        return '<Payment %d>' % self.id
+@app.errorhandler(404)
+def not_found(e):
+    return make_response(jsonify(status=404, error='Not Found', message=e.description), status.HTTP_404_NOT_FOUND)
 
+######################################################################
+# LIST ALL PAYMENTS
+######################################################################
+@app.route('/payments', methods=['GET'])
+def list_payments():
+    payments = Payment.all()
+    results = [payment.serialize() for payment in payments]
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
-class PaymentMethod(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    method_type = db.Column(db.Enum(PaymentMethodType))
+######################################################################
+# LIST ALL PAYMENT METHODS
+######################################################################
+@app.route('/payments/methods', methods=['GET'])
+def list_payment_methods():
+    payment_methods = [pm.value() for pm in PaymentMethodType]
+    return make_response(jsonify(payment_methods), status.HTTP_200_OK)
 
-    def __repr__(self):
-        return '<PaymentMethod %d, type %r>' % (self.id, self.method_type)
 ######################################################################
 # RETRIEVE A PAYMENT
 ######################################################################
 @app.route('/payments/<int:id>', methods=['GET'])
 def get_payments(id):
-    payment = Payment.query.get(id)
-    if not payment:
-        raise NotFound("Payment with id '{}' was not found.".format(id))
+    payment = Payment.find_or_404(id)
     return make_response(jsonify(payment.serialize()), status.HTTP_200_OK)
+
+######################################################################
+# ADD A NEW PAYMENT
+######################################################################
+@app.route('/payments', methods=['POST'])
+def create_payment():
+    payment = Payment()
+    payment.deserialize(request.get_json())
+    payment.save()
+    message = payment.serialize()
+    return make_response(jsonify(message), status.HTTP_201_CREATED, {'Location': payment.self_url() })
 
 ######################################################################
 # Main
 ######################################################################
 
 if __name__ == "__main__":
+    db.create_all()
     app.run(host='0.0.0.0', port=int(PORT), debug=DEBUG)
