@@ -4,6 +4,7 @@ from flask_api import status
 from server import Payment, PaymentStatus, PaymentMethodType, PaymentMethod, app, db
 import logging
 
+JSON_HEADERS = {'Content-Type' : 'application/json'}
 
 class TestServer(unittest.TestCase):
 
@@ -29,7 +30,7 @@ class TestServer(unittest.TestCase):
 
     def test_post_a_payment(self):
         """Create a payment using a POST"""
-        headers = {'Content-Type' : 'application/json'}
+        headers = JSON_HEADERS
         js = {'user_id': 0, 'order_id': 0, 'status': PaymentStatus.UNPAID.value,
             'method_id': PaymentMethodType.CREDIT.value}
         resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, headers=headers)
@@ -41,7 +42,7 @@ class TestServer(unittest.TestCase):
 
     def test_post_an_invalid_payment(self):
         """POST a payment with invalid information"""
-        headers = {'Content-Type' : 'application/json'}
+        headers = JSON_HEADERS
         js = {'user_id': 0, 'order_id': 0, 'status': 'bad_data',
             'method_id': PaymentMethodType.CREDIT.value}
         resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, headers=headers)
@@ -58,22 +59,37 @@ class TestServer(unittest.TestCase):
 
     def test_get_a_payment(self):
         """Create a payment, then GET it"""
-        pm = PaymentMethod(method_type=PaymentMethodType.CREDIT)
-        payment = Payment(user_id=0, order_id=0, status=PaymentStatus.UNPAID,
-            method=pm)
-        self.assertTrue(payment != None)
-        payment.save()
+        js = {'user_id': 0, 'order_id': 0, 'status': PaymentStatus.UNPAID.value,
+            'method_id': PaymentMethodType.CREDIT.value}
+        resp = self.app.post('/payments', data=json.dumps(js), headers=JSON_HEADERS)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
         resp = self.app.get('/payments/1')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         p = Payment() 
         p.deserialize(json.loads(resp.data))
-        self.assertEqual(p.id, payment.id)
-        self.assertEqual(p.user_id, payment.user_id)
-        self.assertEqual(p.order_id, payment.order_id)
-        self.assertEqual(p.status, payment.status)
-        self.assertEqual(p.method_id, payment.method_id)
+        self.assertEqual(p.id, 1)
+        self.assertEqual(p.user_id, js['user_id'])
+        self.assertEqual(p.order_id, js['order_id'])
+        self.assertEqual(p.status, PaymentStatus(js['status']))
+        self.assertEqual(p.method_id, js['method_id'])
 
     def test_get_a_payment_404(self):
         """Try to GET a payment that doesn't exist"""
         resp = self.app.get('/payments/1')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_all_payments(self):
+    	"""GET all payments in the database"""
+        js = {'user_id': 0, 'order_id': 0, 'status': PaymentStatus.UNPAID.value,
+            'method_id': PaymentMethodType.CREDIT.value}
+        resp = self.app.post('/payments', data=json.dumps(js), headers=JSON_HEADERS)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        js = {'user_id': 1, 'order_id': 1, 'status': PaymentStatus.PAID.value,
+            'method_id': PaymentMethodType.DEBIT.value}
+        resp = self.app.post('/payments', data=json.dumps(js), headers=JSON_HEADERS)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        resp = self.app.get('/payments')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(json.loads(resp.data)), 2)

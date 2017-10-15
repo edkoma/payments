@@ -63,7 +63,6 @@ def not_found(e):
 def list_payments():
     payments = Payment.all()
     results = [payment.serialize() for payment in payments]
-    print results
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
