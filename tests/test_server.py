@@ -1,8 +1,8 @@
 import unittest
-import json
-from flask_api import status
-from server import Payment, PaymentStatus, PaymentMethodType, PaymentMethod, app, db
 import logging
+import json
+from flask_api import status    # HTTP Status Codes
+from server import Payment, PaymentStatus, PaymentMethodType, PaymentMethod, app, db
 
 JSON_HEADERS = {'Content-Type' : 'application/json'}
 
@@ -66,7 +66,7 @@ class TestServer(unittest.TestCase):
 
         resp = self.app.get('/payments/1')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        p = Payment() 
+        p = Payment()
         p.deserialize(json.loads(resp.data))
         self.assertEqual(p.id, 1)
         self.assertEqual(p.user_id, js['user_id'])
@@ -93,3 +93,8 @@ class TestServer(unittest.TestCase):
         resp = self.app.get('/payments')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(json.loads(resp.data)), 2)
+
+    def test_list_all_payment_methods(self):
+        """Get all payment methods"""
+        resp = self.app.get('/payments/methods')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
