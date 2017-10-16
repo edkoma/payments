@@ -98,7 +98,7 @@ class TestServer(unittest.TestCase):
         """Get all payment methods"""
         resp = self.app.get('/payments/methods')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(json.loads(resp.data)), 3)
-        paymentMethodList = list(pm.name for pm in PaymentMethodType)
-        responseList = list(json.loads(resp.data))
+        self.assertEqual(len(json.loads(resp.data)), len(PaymentMethodType))
+        paymentMethodList = set(pm.name for pm in PaymentMethodType)
+        responseList = set(json.loads(resp.data))
         self.assertTrue(paymentMethodList == responseList)
