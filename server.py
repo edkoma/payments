@@ -64,7 +64,7 @@ def list_payments():
 ######################################################################
 @app.route('/payments/methods', methods=['GET'])
 def list_payment_methods():
-    payment_methods = [pm.value() for pm in PaymentMethodType]
+    payment_methods = [ pm.name for pm in PaymentMethodType]
     return make_response(jsonify(payment_methods), status.HTTP_200_OK)
 
 ######################################################################

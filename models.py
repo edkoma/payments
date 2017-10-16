@@ -10,6 +10,7 @@ class PaymentStatus(Enum):
     PAID = 3
 
 class PaymentMethodType(Enum):
+    __order__ ='CREDIT DEBIT PAYPAL'
     CREDIT = 1
     DEBIT = 2
     PAYPAL = 3
@@ -21,7 +22,7 @@ class Payment(db.Model):
     status = db.Column(db.Enum(PaymentStatus))
     method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'), nullable=False)
     method = db.relationship('PaymentMethod', backref=db.backref('payments', lazy=True))
-    
+
     def __repr__(self):
         return '<Payment %d>' % self.id
 
@@ -53,7 +54,7 @@ class Payment(db.Model):
     def serialize(self):
         return {"id": self.id, "user_id": self.user_id, "order_id": self.order_id,
                 "status": self.status.value, "method_id": self.method_id}
-    
+
     def deserialize(self, data):
         try:
             # Won't have an id yet if this is when it's being created for the first time
