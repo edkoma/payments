@@ -104,7 +104,7 @@ class TestServer(unittest.TestCase):
             'method_id': PaymentMethodType.CREDIT.value}
         resp = self.app.post('/payments', data=json.dumps(js), content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        js = {'user_id': 0, "order_id": 0, 'status': PaymentStatus.PAID.value, 
+        js = {'user_id': 0, "order_id": 0, 'status': PaymentStatus.PAID.value,
             'method_id': PaymentMethodType.CREDIT.value}
         resp = self.app.put('payments/1', data=json.dumps(js), content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -124,7 +124,7 @@ class TestServer(unittest.TestCase):
         """Update a Payment that does not exist"""
         new_payment = {'user_id': 0, 'order_id': 0, 'status': 3, 'method_id': 1}
         data = json.dumps(new_payment)
-        resp = self.app.put('/pets/4', data=data, content_type='application/json')
+        resp = self.app.put('/payments/4', data=data, content_type='application/json')
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_query_payment_by_user(self):
@@ -160,3 +160,30 @@ class TestServer(unittest.TestCase):
         self.assertEqual(len(data), 1)
         query_item = data[0]
         self.assertEqual(query_item['order_id'], 2)
+        
+    def test_delete_payment(self):
+        """ Delete a payment """
+        # First insert a payment
+        js = {'user_id': 1, 'order_id': 1, 'status': PaymentStatus.UNPAID.value,
+            'method_id': PaymentMethodType.CREDIT.value}
+        resp = self.app.post('/payments', data=json.dumps(js), headers=JSON_HEADERS)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        # Now delete the payment
+        resp = self.app.delete('/payments/1', content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # Assert that no payments are present
+        resp = self.app.get('/payments')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(json.loads(resp.data)),0)
+
+    def test_delete_payment_not_found(self):
+        """ Delete a payment that does not exist"""
+        #Assert that no payments exist
+        resp = self.app.get('/payments')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(json.loads(resp.data)),0)
+        #Call delete for any id
+        resp = self.app.delete('/payments/0', content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
