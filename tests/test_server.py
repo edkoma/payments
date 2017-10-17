@@ -166,7 +166,7 @@ class TestServer(unittest.TestCase):
         # First insert a payment
         js = {'user_id': 1, 'order_id': 1, 'status': PaymentStatus.UNPAID.value,
             'method_id': PaymentMethodType.CREDIT.value}
-        resp = self.app.post('/payments', data=json.dumps(js), headers=JSON_HEADERS)
+        resp = self.app.post('/payments', data=json.dumps(js), content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Now delete the payment
         resp = self.app.delete('/payments/1', content_type='application/json')
