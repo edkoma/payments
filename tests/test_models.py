@@ -44,29 +44,3 @@ class TestModels(unittest.TestCase):
         # This should be the only payment in the database, sqlite starts primary keys at 1
         p = Payment.find(1)
         self.assertEqual(p, payment)
-
-    def test_update_payment(self):
-        """Update an existing Payment"""
-        pm = PaymentMethod(method_type=PaymentMethodType.DEBIT)
-        new_payment = {'user_id': 0, "order_id": 0, 'status': 1, 'method_id': 2, 'method': 'DEBIT'}
-        data =json.dumps(new_payment)
-        resp = self.app.put('payments/1', data = data, content_type = 'application/json')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        new_json = json.loads(resp.data)
-        self.assertEqual(new_json['status'], 1)
-
-    def test_update_payment_with_no_data(self):
-        """ Update a Payment with no data passed """
-        resp = self.app.put('/payments/2', data=None, content_type = 'application/json')
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_update_payment_not_found(self):
-        """Update a Payment that does not exist"""
-        pm = PaymentMethod(method_type=PaymentMethodType.CREDIT)
-        new_payment = {'user_id': 0, 'order_id': 0, 'status': 3, 'method_id': 1, 'method': 'CREDIT'}
-        data = json.dumps(new_payment)
-        resp = self.app.put('/pets/4', data=data, content_type='application/json')
-        self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
-
-
-        

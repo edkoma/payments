@@ -80,8 +80,10 @@ def get_payments(id):
 ######################################################################
 @app.route('/payments/<int:id>', methods=['PUT'])
 def update_payments(id):
+    print('update')
+    print(request.get_json())
     payment = Payment.find_or_404(id)
-    payment.deserialize(requst.get_json())
+    payment.deserialize(request.get_json())
     payment.id = id
     payment.save()
     return make_response(jsonify(payment.serialize()), status.HTTP_200_OK)
