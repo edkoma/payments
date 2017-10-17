@@ -48,6 +48,16 @@ class Payment(db.Model):
         """ Find a Payment by its id """
         return Payment.query.get_or_404(payment_id)
 
+    @staticmethod
+    def find_by_user(user_id):
+        """ Find a Payment/s by its user id"""
+        return Payment.query.filter(Payment.user_id == user_id)
+
+    @staticmethod
+    def find_by_order(order_id):
+        """ Find a Payment/s by its order id"""
+        return Payment.query.filter(Payment.order_id == order_id)
+
     def self_url(self):
         return url_for('get_payments', id=self.id, _external=True)
 

@@ -55,7 +55,14 @@ def not_found(e):
 ######################################################################
 @app.route('/payments', methods=['GET'])
 def list_payments():
-    payments = Payment.all()
+    user_id = request.args.get('user')
+    order_id = request.args.get('order')
+    if user_id:
+        payments = Payment.find_by_user(user_id)
+    elif order_id:
+        payments = Payment.find_by_order(order_id)
+    else:
+        payments = Payment.all()
     results = [payment.serialize() for payment in payments]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
