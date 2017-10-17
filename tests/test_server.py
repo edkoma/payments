@@ -4,8 +4,6 @@ import json
 from flask_api import status    # HTTP Status Codes
 from server import Payment, PaymentStatus, PaymentMethodType, PaymentMethod, app, db
 
-JSON_HEADERS = {'Content-Type' : 'application/json'}
-
 class TestServer(unittest.TestCase):
 
     def setUp(self):
@@ -30,10 +28,9 @@ class TestServer(unittest.TestCase):
 
     def test_post_a_payment(self):
         """Create a payment using a POST"""
-        headers = JSON_HEADERS
         js = {'user_id': 0, 'order_id': 0, 'status': PaymentStatus.UNPAID.value,
             'method_id': PaymentMethodType.CREDIT.value}
-        resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, headers=headers)
+        resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         get_resp = self.app.get('/payments/1')
         p = Payment()
@@ -42,26 +39,24 @@ class TestServer(unittest.TestCase):
 
     def test_post_an_invalid_payment(self):
         """POST a payment with invalid information"""
-        headers = JSON_HEADERS
         js = {'user_id': 0, 'order_id': 0, 'status': 'bad_data',
             'method_id': PaymentMethodType.CREDIT.value}
-        resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, headers=headers)
+        resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertTrue('body of request contained bad or no data' in resp.data)
 
     def test_post_a_payment_with_missing_information(self):
         """POST a payment with missing information"""
-        headers = {'Content-Type' : 'application/json'}
         js = {'order_id': 0, 'status': PaymentStatus.UNPAID.value,
             'method_id': PaymentMethodType.CREDIT.value}
-        resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, headers=headers)
+        resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_a_payment(self):
         """Create a payment, then GET it"""
         js = {'user_id': 0, 'order_id': 0, 'status': PaymentStatus.UNPAID.value,
             'method_id': PaymentMethodType.CREDIT.value}
-        resp = self.app.post('/payments', data=json.dumps(js), headers=JSON_HEADERS)
+        resp = self.app.post('/payments', data=json.dumps(js), content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         resp = self.app.get('/payments/1')
@@ -83,11 +78,11 @@ class TestServer(unittest.TestCase):
     	"""GET all payments in the database"""
         js = {'user_id': 0, 'order_id': 0, 'status': PaymentStatus.UNPAID.value,
             'method_id': PaymentMethodType.CREDIT.value}
-        resp = self.app.post('/payments', data=json.dumps(js), headers=JSON_HEADERS)
+        resp = self.app.post('/payments', data=json.dumps(js), content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         js = {'user_id': 1, 'order_id': 1, 'status': PaymentStatus.PAID.value,
             'method_id': PaymentMethodType.DEBIT.value}
-        resp = self.app.post('/payments', data=json.dumps(js), headers=JSON_HEADERS)
+        resp = self.app.post('/payments', data=json.dumps(js), content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         resp = self.app.get('/payments')
@@ -127,11 +122,41 @@ class TestServer(unittest.TestCase):
 
     def test_update_payment_not_found(self):
         """Update a Payment that does not exist"""
-        pm = PaymentMethod(method_type=PaymentMethodType.CREDIT)
         new_payment = {'user_id': 0, 'order_id': 0, 'status': 3, 'method_id': 1}
         data = json.dumps(new_payment)
         resp = self.app.put('/pets/4', data=data, content_type='application/json')
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_query_payment_by_user(self):
+        """ Query Payment by user ID """
+        js = {'user_id': 1, 'order_id': 0, 'status': PaymentStatus.UNPAID.value,
+            'method_id': PaymentMethodType.CREDIT.value}
+        resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        js = {'user_id': 2, 'order_id': 0, 'status': PaymentStatus.UNPAID.value,
+            'method_id': PaymentMethodType.CREDIT.value}
+        resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        resp = self.app.get('/payments', query_string='user=2')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = json.loads(resp.data)
+        self.assertEqual(len(data), 1)
+        query_item = data[0]
+        self.assertEqual(query_item['user_id'], 2)
 
-        
+    def test_query_payment_by_order(self):
+        """ Query Payment by order ID """
+        js = {'user_id': 0, 'order_id': 1, 'status': PaymentStatus.UNPAID.value,
+            'method_id': PaymentMethodType.CREDIT.value}
+        resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        js = {'user_id': 0, 'order_id': 2, 'status': PaymentStatus.UNPAID.value,
+            'method_id': PaymentMethodType.CREDIT.value}
+        resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        resp = self.app.get('/payments', query_string='order=2')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = json.loads(resp.data)
+        self.assertEqual(len(data), 1)
+        query_item = data[0]
+        self.assertEqual(query_item['order_id'], 2)
