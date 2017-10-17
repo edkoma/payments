@@ -107,6 +107,16 @@ def create_payment():
     return make_response(jsonify(message), status.HTTP_201_CREATED, {'Location': payment.self_url() })
 
 ######################################################################
+# DELETE A PAYMENT
+######################################################################
+@app.route('/payments/<int:id>', methods=['DELETE'])
+def delete_payment(id):
+    payment = Payment.find(id)
+    if payment:
+        payment.delete()
+    return make_response('', status.HTTP_204_NO_CONTENT)
+
+######################################################################
 # Main
 ######################################################################
 
