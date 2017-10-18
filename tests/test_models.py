@@ -86,3 +86,23 @@ class TestModels(unittest.TestCase):
         self.assertEqual(p.user_id, 2)
         self.assertEqual(p.order_id, 2)
         self.assertEqual(p.status, PaymentStatus.PAID)
+
+    def test_find_payment_method(self):
+        """Find a Payment Method by ID """
+        PaymentMethod(method_type=PaymentMethodType.CREDIT).save()
+        PaymentMethod(method_type=PaymentMethodType.DEBIT).save()
+        pm = PaymentMethod.find(2)
+        self.assertIsNot(pm, None)
+        self.assertEqual(pm.id, 2)
+        self.assertEqual(pm.method_type, PaymentMethodType.DEBIT)
+        self.assertFalse(pm.is_default)
+
+    def test_set_default_payment_method(self):
+        """Set a payment method to be the default"""
+        p1 = PaymentMethod(method_type=PaymentMethodType.CREDIT)
+        p2 = PaymentMethod(method_type=PaymentMethodType.DEBIT)
+        self.assertFalse(p1.is_default)
+        self.assertFalse(p2.is_default)
+        p1.set_default()
+        self.assertTrue(p1.is_default)
+        self.assertFalse(p2.is_default)

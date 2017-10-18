@@ -67,18 +67,10 @@ def list_payments():
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
-# LIST ALL PAYMENT METHODS
-######################################################################
-@app.route('/payments/methods', methods=['GET'])
-def list_payment_methods():
-    payment_methods = [ pm.name for pm in PaymentMethodType]
-    return make_response(jsonify(payment_methods), status.HTTP_200_OK)
-
-######################################################################
 # RETRIEVE A PAYMENT
 ######################################################################
 @app.route('/payments/<int:id>', methods=['GET'])
-def get_payments(id):
+def get_payment(id):
     payment = Payment.find_or_404(id)
     return make_response(jsonify(payment.serialize()), status.HTTP_200_OK)
 
@@ -86,9 +78,7 @@ def get_payments(id):
 # UPDATE AN EXISTING PAYMENT
 ######################################################################
 @app.route('/payments/<int:id>', methods=['PUT'])
-def update_payments(id):
-    print('update')
-    print(request.get_json())
+def update_payment(id):
     payment = Payment.find_or_404(id)
     payment.deserialize(request.get_json())
     payment.id = id
@@ -115,6 +105,65 @@ def delete_payment(id):
     if payment:
         payment.delete()
     return make_response('', status.HTTP_204_NO_CONTENT)
+
+######################################################################
+# LIST ALL PAYMENT METHODS
+######################################################################
+@app.route('/payments/methods', methods=['GET'])
+def list_payment_methods():
+    payment_methods = PaymentMethod.all()
+    results = [ pm.serialize() for pm in payment_methods]
+    return make_response(jsonify(results), status.HTTP_200_OK)
+
+######################################################################
+# RETRIEVE A PAYMENT METHOD
+######################################################################
+@app.route('/payments/methods/<int:id>', methods=['GET'])
+def get_payment_method(id):
+    pm = PaymentMethod.find_or_404(id)
+    return make_response(jsonify(pm.serialize()), status.HTTP_200_OK)
+
+######################################################################
+# UPDATE AN EXISTING PAYMENT METHOD
+######################################################################
+@app.route('/payments/methods/<int:id>', methods=['PUT'])
+def update_payment_method(id):
+    print(request.get_json())
+    pm = PaymentMethod.find_or_404(id)
+    pm.deserialize(request.get_json())
+    pm.id = id
+    pm.save()
+    return make_response(jsonify(pm.serialize()), status.HTTP_200_OK)
+
+######################################################################
+# ADD A NEW PAYMENT METHOD
+######################################################################
+@app.route('/payments/methods', methods=['POST'])
+def create_payment_method():
+    pm = PaymentMethod()
+    pm.deserialize(request.get_json())
+    pm.save()
+    message = pm.serialize()
+    return make_response(jsonify(message), status.HTTP_201_CREATED, {'Location': pm.self_url() })
+
+######################################################################
+# DELETE A PAYMENT METHOD
+######################################################################
+@app.route('/payments/methods/<int:id>', methods=['DELETE'])
+def delete_payment_method(id):
+    pm = PaymentMethod.find(id)
+    if pm:
+        pm.delete()
+    return make_response('', status.HTTP_204_NO_CONTENT)
+
+######################################################################
+# SET PAYMENT METHOD AS DEFAULT
+######################################################################
+@app.route('/payments/methods/<int:id>/set-default', methods=['PUT'])
+def set_payment_method_default(id):
+    pm = PaymentMethod.find_or_404(id)
+    pm.set_default()
+    return make_response(jsonify(pm.serialize(), status.HTTP_200_OK))
 
 ######################################################################
 # Main
