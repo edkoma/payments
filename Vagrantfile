@@ -50,11 +50,14 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
 
   ######################################################################
-  # Add Python Flask environment
+  # Add Python Flask environment & CloudFoundry CLI
   ######################################################################
-  # Setup a Python development environment
+  # Setup a Python development environment & Cloudfoundry CLI
   config.vm.provision "shell", inline: <<-SHELL
+    wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+    echo "deb http://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
     apt-get update
+    apt-get install -y git zip tree python-pip python-dev cf-cli
     apt-get install -y git python-pip python-dev build-essential
     pip install --upgrade pip
     apt-get -y autoremove
@@ -64,5 +67,21 @@ Vagrant.configure("2") do |config|
     cd /vagrant
     sudo pip install -r requirements.txt
   SHELL
+
+######################################################################
+# Add a Redis docker container
+######################################################################
+config.vm.provision "shell", inline: <<-SHELL
+  # Prepare Redis data share
+  sudo mkdir -p /var/lib/redis/data
+  sudo chown ubuntu:ubuntu /var/lib/redis/data
+SHELL
+
+# Add Redis docker container
+config.vm.provision "docker" do |d|
+  d.pull_images "redis:alpine"
+  d.run "redis:alpine",
+    args: "--restart=always -d --name redis -p 6379:6379 -v /var/lib/redis/data:/data"
+end
 
 end
