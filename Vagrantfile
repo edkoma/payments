@@ -54,8 +54,10 @@ Vagrant.configure("2") do |config|
   ######################################################################
   # Setup a Python development environment
   config.vm.provision "shell", inline: <<-SHELL
+    wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+    echo "deb http://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
     apt-get update
-    apt-get install -y git python-pip python-dev build-essential
+    apt-get install -y git python-pip python-dev build-essential cf-cli
     pip install --upgrade pip
     apt-get -y autoremove
     # Make vi look nice ;-)
