@@ -4,11 +4,50 @@ from flask_api import status
 from server import Payment, PaymentStatus, PaymentMethodType, PaymentMethod, app, db, DataValidationError
 import logging
 
+VCAP_SERVICES =
+{
+  "cleardb": [
+    {
+      "credentials": {
+        "jdbcUrl": "jdbc:mysql://us-cdbr-sl-dfw-01.cleardb.net/ibmx_8e5cdd0069b847c?user=b74a59f2427cf5&password=6e31a1cf",
+        "uri": "mysql://b74a59f2427cf5:6e31a1cf@us-cdbr-sl-dfw-01.cleardb.net:3306/ibmx_8e5cdd0069b847c?reconnect=true",
+        "name": "ibmx_8e5cdd0069b847c",
+        "hostname": "us-cdbr-sl-dfw-01.cleardb.net",
+        "port": "3306",
+        "username": "b74a59f2427cf5",
+        "password": "6e31a1cf"
+      },
+      "syslog_drain_url": null,
+      "volume_mounts": [],
+      "label": "cleardb",
+      "provider": null,
+      "plan": "cb5",
+      "name": "ClearDB MySQL Database",
+      "tags": [
+        "Data Stores",
+        "DBA",
+        "(P) Analytics",
+        "(S) Cloud",
+        "Bluemix",
+        "Platform",
+        "ibm_dedicated_public",
+        "Infrastructure",
+        "Service",
+        "data_management",
+        "IT Operations",
+        "web and app",
+        "ibm_third_party"
+      ]
+    }
+  ]
+}
 
 class TestModels(unittest.TestCase):
 
     def setUp(self):
-        # Only log criticl errors
+        #Initialize the Database
+        Payment.init_db()
+        # Only log critical errors
         app.debug = True
         app.logger.addHandler(logging.StreamHandler())
         app.logger.setLevel(logging.CRITICAL)

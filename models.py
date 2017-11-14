@@ -118,6 +118,18 @@ class PaymentMethod(db.Model):
         """ Find a Payment by its id """
         return PaymentMethod.query.get_or_404(payment_id)
 
+    @staticmethod
+    def init_db():
+        #Get credentials from the Bluemix environment
+        if 'VCAP_SERVICES' in os.environ:
+            Payment.logger.info("Using VCAP_SERVICES...")
+            vcap_services = os.environ['VCAP_SERVICES']
+            services = json.loads(vcap_services)
+            creds = services['cleardb'][0]['credentials']
+            Payment.logger.info("Connecting to DB on host %s port %s", creds['hostname'], creds['port'])
+        else:
+            Payment.logger.info("VCAP_SERVICES not found, checking localhost for DB")
+
     def self_url(self):
         return url_for('get_payment_method', id=self.id, _external=True)
 
