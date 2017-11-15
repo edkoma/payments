@@ -36,7 +36,10 @@ from models import *
 
 @app.route("/")
 def home():
-    return "Payments Home Page"
+    return jsonify(name='Payments Demo REST API Service',
+                   version='1.0',
+                   paths=url_for('list_payments', _external=True)
+                  ), status.HTTP_200_OK
 
 ######################################################################
 # Error Handlers

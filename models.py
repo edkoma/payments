@@ -1,7 +1,9 @@
 from server import db, DataValidationError
 from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
+from SQLAlchemy import create_engine
 from flask import url_for
+import logging
 
 
 class PaymentStatus(Enum):
@@ -119,16 +121,26 @@ class PaymentMethod(db.Model):
         return PaymentMethod.query.get_or_404(payment_id)
 
     @staticmethod
+    def connect_to_db():
+        engine = create_engine('mysql://b74a59f2427cf5:6e31a1cf@us-cdbr-sl-dfw-01.cleardb.net:3306/ibmx_8e5cdd0069b847c?reconnect=true')
+        try:
+            connection = engine.connect()
+            logging.info("Connection established")
+        except:
+            logging.info("Connection Error")
+
+    @staticmethod
     def init_db():
         #Get credentials from the Bluemix environment
         if 'VCAP_SERVICES' in os.environ:
-            Payment.logger.info("Using VCAP_SERVICES...")
+            logging.info("Using VCAP_SERVICES...")
             vcap_services = os.environ['VCAP_SERVICES']
             services = json.loads(vcap_services)
             creds = services['cleardb'][0]['credentials']
-            Payment.logger.info("Connecting to DB on host %s port %s", creds['hostname'], creds['port'])
+            logging.info("Connecting to MySQL DB on host %s port %s", creds['hostname'], creds['port'])
+            Payment.connect_to_db()
         else:
-            Payment.logger.info("VCAP_SERVICES not found, checking localhost for DB")
+            logging.info("VCAP_SERVICES not found, checking localhost for mySQL")
 
     def self_url(self):
         return url_for('get_payment_method', id=self.id, _external=True)

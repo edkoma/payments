@@ -4,8 +4,7 @@ from flask_api import status
 from server import Payment, PaymentStatus, PaymentMethodType, PaymentMethod, app, db, DataValidationError
 import logging
 
-VCAP_SERVICES =
-{
+VCAP_SERVICES = {
   "cleardb": [
     {
       "credentials": {
