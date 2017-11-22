@@ -5,7 +5,7 @@ python:
 install: "pip install -r requirements.txt"
 # command to run tests
 before_script: 
- - mysql -e 'CREATE DATABASE IF NOT EXISTS payment;'
+ - mysql -e 'CREATE DATABASE IF NOT EXISTS payments;'
 script:
  - nosetests --with-coverage --cover-erase
 #after_success:
