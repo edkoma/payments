@@ -11,4 +11,4 @@ script:
 #after_success:
 # - codecov
 services:
-- sudo mysql -uroot -p
+- mysql
