@@ -1,6 +1,13 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+
+unless Vagrant.has_plugin?("vagrant-docker-compose")
+  system("vagrant plugin install vagrant-docker-compose")
+  puts "Dependencies installed, please try the command again."
+  exit
+end
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
@@ -30,6 +37,7 @@ Vagrant.configure("2") do |config|
   end
 
 
+
   # Copy your .gitconfig file so that your git credentials are correct
   if File.exists?(File.expand_path("~/.gitconfig"))
     config.vm.provision "file", source: "~/.gitconfig", destination: "~/.gitconfig"
@@ -57,7 +65,7 @@ Vagrant.configure("2") do |config|
     wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
     echo "deb http://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
     apt-get update
-    apt-get install -y git python-pip python-dev build-essential cf-cli
+    apt-get install -y git python-pip python-dev build-essential cf-cli libmysqlclient-dev
     pip install --upgrade pip
     apt-get -y autoremove
     # Make vi look nice ;-)
@@ -66,5 +74,34 @@ Vagrant.configure("2") do |config|
     cd /vagrant
     sudo pip install -r requirements.txt
   SHELL
+
+  ######################################################################
+  # Add MySQL docker container
+  ######################################################################
+  config.vm.provision "shell", inline: <<-SHELL
+    # Prepare MySQL data share
+    sudo mkdir -p /var/lib/mysql
+    sudo chown ubuntu:ubuntu /var/lib/mysql
+  SHELL
+  # Add MySQL docker container
+  config.vm.provision "docker" do |d|
+    d.pull_images "mariadb"
+    d.run "mariadb",
+      args: "-p 3306:3306 --restart=always -d --name mariadb -v /var/lib/mysql:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=passw0rd -e MYSQL_DATABASE=payments"
+  end
+
+  # # Add Docker compose
+  # # Note: you need to install the vagrant-docker-compose or this will fail!
+  # # vagrant plugin install vagrant-docker-compose
+  # # config.vm.provision :docker_compose, yml: "/vagrant/docker-compose.yml", run: "always"
+  # # config.vm.provision :docker_compose, yml: "/vagrant/docker-compose.yml", rebuild: true, run: "always"
+  # config.vm.provision :docker_compose
+
+  # # Install Docker Compose after Docker Engine
+  # config.vm.provision "shell", privileged: false, inline: <<-SHELL
+  #   sudo pip install docker-compose
+  #   # Install the IBM Container plugin as vagrant
+  #   sudo -H -u vagrant bash -c "echo Y | cf install-plugin https://static-ice.ng.bluemix.net/ibm-containers-linux_x64"
+  # SHELL
 
 end
