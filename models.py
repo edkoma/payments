@@ -20,8 +20,9 @@ class Payment(db.Model):
     user_id = db.Column(db.Integer, nullable=False)
     order_id = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Enum(PaymentStatus))
-    method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'), nullable=False)
-    method = db.relationship('PaymentMethod', backref=db.backref('payments', lazy=True))
+    method_id = db.Column(db.Integer, nullable=False)
+    # method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'), nullable=False)
+    # method = db.relationship('PaymentMethod', backref=db.backref('payments', lazy=True))
 
     def __repr__(self):
         return '<Payment %d>' % self.id

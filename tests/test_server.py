@@ -12,7 +12,7 @@ class TestServer(unittest.TestCase):
         app.logger.addHandler(logging.StreamHandler())
         app.logger.setLevel(logging.CRITICAL)
         # Set up the test database
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/payments'
         db.drop_all()    # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
         self.app = app.test_client()
@@ -29,7 +29,7 @@ class TestServer(unittest.TestCase):
     def test_post_a_payment(self):
         """Create a payment using a POST"""
         js = {'user_id': 0, 'order_id': 0, 'status': PaymentStatus.UNPAID.value,
-            'method_id': PaymentMethodType.CREDIT.value}
+            'method_id': 0}
         resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         get_resp = self.app.get('/payments/1')
