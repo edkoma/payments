@@ -3,6 +3,7 @@ import logging
 import json
 from flask_api import status    # HTTP Status Codes
 from server import Payment, PaymentStatus, PaymentMethodType, PaymentMethod, app, db
+import os
 
 class TestServer(unittest.TestCase):
 
@@ -12,7 +13,10 @@ class TestServer(unittest.TestCase):
         app.logger.addHandler(logging.StreamHandler())
         app.logger.setLevel(logging.CRITICAL)
         # Set up the test database
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/payments'
+        if 'TRAVIS' in os.environ:
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/payments'
+        else:
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:passw0rd@localhost/payments'
         db.drop_all()    # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
         self.app = app.test_client()
