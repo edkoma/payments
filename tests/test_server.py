@@ -3,6 +3,7 @@ import logging
 import json
 from flask_api import status    # HTTP Status Codes
 from server import Payment, PaymentStatus, PaymentMethodType, PaymentMethod, app, db
+import os
 
 class TestServer(unittest.TestCase):
 
