@@ -12,7 +12,7 @@ class TestServer(unittest.TestCase):
         app.logger.addHandler(logging.StreamHandler())
         app.logger.setLevel(logging.CRITICAL)
         # Set up the test database
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/payments'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql:passw0rd//root:@localhost/payments'
         db.drop_all()    # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
         self.app = app.test_client()
