@@ -48,11 +48,6 @@ Vagrant.configure("2") do |config|
     config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
   end
 
-  # Copy nosetests config file so that you can just run `nosetests` without having to specify options
-  if File.exists?(File.expand_path("/vagrant/.noserc"))
-    config.vm.provision "file", source: "/vagrant/.noserc", destination: "~/.noserc"
-  end
-
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
