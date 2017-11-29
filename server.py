@@ -4,6 +4,7 @@ from flask import Flask, Response, jsonify, request, json, make_response, url_fo
 from flask_api import status
 from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
+from vcap_services import get_database_uri
 
 
 ######################################################################
@@ -13,11 +14,7 @@ app = Flask(__name__)
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 PORT = os.getenv('PORT', '5000')
 
-# init SQLAlchemy db
-if 'TRAVIS' in os.environ:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/payments'
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:passw0rd@localhost/payments'
+app.config['SQLALCHEMY_DATABASE_URI'] = get_database_uri()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
