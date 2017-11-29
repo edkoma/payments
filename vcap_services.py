@@ -17,13 +17,19 @@ def get_database_uri():
         hostname = creds["hostname"]
         port = creds["port"]
         name = creds["name"]
+    elif 'TRAVIS' in os.environ:
+        username = 'root'
+        password = ''
+        hostname = 'localhost'
+        port = '3306'
+        name = 'payments'
     else:
         logging.info("Using localhost database...")
         username = 'root'
         password = 'passw0rd'
         hostname = 'localhost'
         port = '3306'
-        name = 'development'
+        name = 'payments'
 
     logging.info("Conecting to database on host %s port %s", hostname, port)
     connect_string = 'mysql+pymysql://{}:{}@{}:{}/{}'
