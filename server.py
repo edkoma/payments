@@ -36,7 +36,7 @@ from models import *
 
 @app.route("/")
 def home():
-    return "Payments Home Page"
+    return app.send_static_file('index.html')
 
 ######################################################################
 # Error Handlers

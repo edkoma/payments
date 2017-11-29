@@ -28,7 +28,7 @@ class TestServer(unittest.TestCase):
     def test_get_home(self):
         """GET the home page"""
         resp = self.app.get('/')
-        self.assertTrue('Payments Home Page' in resp.data)
+        self.assertTrue('NYU DevOps Fall 2017 Payments' in resp.data)
 
     def test_post_a_payment(self):
         """Create a payment using a POST"""
