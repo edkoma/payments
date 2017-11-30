@@ -36,7 +36,7 @@ from models import *
 
 @app.route("/")
 def home():
-    return "Payments Home Page"
+    return app.send_static_file('index.html')
 
 ######################################################################
 # Error Handlers
@@ -55,8 +55,8 @@ def not_found(e):
 ######################################################################
 @app.route('/payments', methods=['GET'])
 def list_payments():
-    user_id = request.args.get('user')
-    order_id = request.args.get('order')
+    user_id = request.args.get('user_id')
+    order_id = request.args.get('order_id')
     if user_id:
         payments = Payment.find_by_user(user_id)
     elif order_id:

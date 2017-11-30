@@ -28,7 +28,7 @@ class TestServer(unittest.TestCase):
     def test_get_home(self):
         """GET the home page"""
         resp = self.app.get('/')
-        self.assertTrue('Payments Home Page' in resp.data)
+        self.assertTrue('NYU DevOps Fall 2017 Payments' in resp.data)
 
     def test_post_a_payment(self):
         """Create a payment using a POST"""
@@ -132,7 +132,7 @@ class TestServer(unittest.TestCase):
             'method_id': PaymentMethodType.CREDIT.value}
         resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        resp = self.app.get('/payments', query_string='user=2')
+        resp = self.app.get('/payments', query_string='user_id=2')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
         self.assertEqual(len(data), 1)
@@ -149,7 +149,7 @@ class TestServer(unittest.TestCase):
             'method_id': PaymentMethodType.CREDIT.value}
         resp = self.app.post('/payments', data=json.dumps(js), follow_redirects=True, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        resp = self.app.get('/payments', query_string='order=2')
+        resp = self.app.get('/payments', query_string='order_id=2')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
         self.assertEqual(len(data), 1)
