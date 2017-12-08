@@ -55,9 +55,19 @@
                 <label class="control-label col-sm-2" for="payment_status">Status:</label>
                 <div class="col-sm-10">
                   <select class="form-control" id="payment_status">
-                      <option value="unpaid" selected>Unpaid</option>
-                      <option value="processing">Processing</option>
-                      <option value="paid">Paid</option>
+                      <option value="1" selected>Unpaid</option>
+                      <option value="2">Processing</option>
+                      <option value="3">Paid</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="payment_method_id">Method:</label>
+                <div class="col-sm-10">
+                  <select class="form-control" id="payment_method_id">
+                      <option value="1" selected>Credit</option>
+                      <option value="2">Debit</option>
+                      <option value="3">Paypal</option>
                   </select>
                 </div>
               </div>
