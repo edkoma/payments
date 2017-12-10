@@ -9,13 +9,15 @@ $(function () {
         $("#payment_id").val(res.id);
         $("#payment_user_id").val(res.user_id);
         $("#payment_order_id").val(res.order_id);
-        if (res.status === 1) {
-            $("#payment_status").val("unpaid");
-        } else if (res.status === 2) {
-            $("#payment_status").val("processing");
-        } else {
-            $("#payment_status").val("paid");
-        }
+        // if (res.status === 1) {
+        //     $("#payment_status").val("UNPAID");
+        // } else if (res.status === 2) {
+        //     $("#payment_status").val("PROCESSING");
+        // } else {
+        //     $("#payment_status").val("PAID");
+        // }
+        $("#payment_status").val(res.status);
+        $("#method_id").val(res.method_id);
     }
 
     /// Clears all form fields
@@ -23,6 +25,8 @@ $(function () {
         $("#payment_id").val("");
         $("#payment_user_id").val("");
         $("#payment_order_id").val("");
+        $("#payment_status").val("1");
+        $("#method_id").val("1");
     }
 
     // Updates the flash message area
@@ -37,14 +41,16 @@ $(function () {
 
     $("#create-btn").click(function () {
 
-        var user_id = $("#payment_user_id").val();
-        var order_id = $("#payment_order_id").val();
-        var status = $("#payment_status").val();
+        var user_id = parseInt($("#payment_user_id").val());
+        var order_id = parseInt($("#payment_order_id").val());
+        var status = parseInt($("#payment_status").val());
+        var method_id = parseInt($("#payment_method_id").val());
 
         var data = {
             "user_id": user_id,
             "order_id": order_id,
-            "status": status
+            "status": status,
+            "method_id": method_id
         };
 
         var ajax = $.ajax({
@@ -71,15 +77,17 @@ $(function () {
 
     $("#update-btn").click(function () {
 
-        var payment_id = $("#payment_id").val();
-        var user_id = $("#payment_user_id").val();
-        var order_id = $("#payment_order_id").val();
-        var status = $("#payment_status").val();
+        var payment_id = parseInt($("#payment_id").val());
+        var user_id = parseInt($("#payment_user_id").val());
+        var order_id = parseInt($("#payment_order_id").val());
+        var status = parseInt($("#payment_status").val());
+        var method_id = parseInt($("#payment_method_id").val());
 
         var data = {
             "user_id": user_id,
             "order_id": order_id,
-            "status": status
+            "status": status,
+            "method_id": method_id
         };
 
         var ajax = $.ajax({
@@ -171,6 +179,7 @@ $(function () {
         var user_id = $("#payment_user_id").val();
         var order_id = $("#payment_order_id").val();
         var status = $("#payment_status").val();
+        var method_id = $("#payment_method_id").val();
 
         var queryString = ""
 
@@ -184,11 +193,18 @@ $(function () {
                 queryString += 'order_id=' + order_id
             }
         }
-        if (available) {
+        if (status) {
             if (queryString.length > 0) {
                 queryString += '&status=' + status
             } else {
                 queryString += 'status=' + status
+            }
+        }
+        if (method_id) {
+            if (queryString.length > 0) {
+                queryString += '&method_id=' + method_id
+            } else {
+                queryString += 'method_id=' + method_id
             }
         }
 
