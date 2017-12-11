@@ -273,7 +273,7 @@ def create_payment():
         """
 
     payment = Payment()
-    payment.deserialize(request.get_jso n())
+    payment.deserialize(request.get_json())
     payment.save()
     message = payment.serialize()
     return make_response(jsonify(message), status.HTTP_201_CREATED, {'Location': payment.self_url() })
