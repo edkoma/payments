@@ -33,7 +33,6 @@ app.config['SWAGGER'] = {
             "description": "This is a Payments REST service.",
             "endpoint": 'v1_spec',
             "route": '/v1/spec'
-            "basePath:" '/'
         }
     ]
 }
@@ -48,7 +47,6 @@ Swagger(app)
 ######################################################################
 class DataValidationError(ValueError):
     pass
-
 
 # This needs to be after db, classes, etc are initialized to avoid circular imports
 from models import *
@@ -83,32 +81,53 @@ def list_payments():
     This endpoint will return all Payments unless a query parameter is specified.
     ---
     tags:
-        - Payments
+      - Payments
     description: The Payments endpoint allows you to query Payments
+    parameters:
+      - name: user_id
+        in: query
+        description: the user id of the payment in the system
+        required: false
+        type: string
+      - name: order_id
+        in: query
+        description: The order id of the payment in the system
+        required: false
+        type: string
+      - name: status
+        in: query
+        description: Describes if the payment is UNPAID, PROCESSING, or PAID
+        required: false
+        type: string
+      - name: method_id
+        in: query
+        description: The method id of the payment in the system
+        required: false
+        type: string
     responses:
-        200:
-            description: A list of Payments
+      200:
+        description: A list of payments
+        schema:
+          type: array
+          items:
             schema:
-                type: array
-                items:
-                    schema:
-                        id: Payment
-                        properties:
-                            id:
-                                type: Integer
-                                description: unique id assigned internally by Service
-                            user_id:
-                                type: Integer
-                                description: The user id of the payment in the system
-                            order_id:
-                                type: Integer
-                                description: The order id of the payment in the system
-                            status:
-                                type: String
-                                description: Describes if the payment is UNPAID, PROCESSING, or PAID
-                            method_id:
-                                type: Integer
-                                description: The method id of the payment in the system
+              id: Payment
+              properties:
+                id:
+                  type: integer
+                  description: unique id assigned internally by Service
+                user_id:
+                  type: integer
+                  description: The user id of the payment in the system
+                order_id:
+                  type: integer
+                  description: The order id of the payment in the system
+                status:
+                  type: string
+                  description: Describes if the payment is UNPAID, PROCESSING, or PAID
+                method_id:
+                  type: integer
+                  description: The method id of the payment in the system
     """
     user_id = request.args.get('user_id')
     order_id = request.args.get('order_id')
@@ -129,18 +148,17 @@ def get_payment(id):
     """
     Retrieves a single Payment
     This endpoint will return a Payment based on it's id
-
     ---
     tags:
         - Payments
     produces:
         - application/json
     parameters:
-        name: id
+      - name: id
         in: path
         description: ID of payment to retrive
-        type: Integer
-        required: True
+        type: integer
+        required: true
     responses:
         200:
             description: Payment returned with that id
@@ -148,19 +166,19 @@ def get_payment(id):
                 id: Payment
                 properties:
                     id:
-                        type: Integer
+                        type: integer
                         description: Unique id assigned internally by service
                     user_id:
-                        type: Integer
+                        type: integer
                         description: The user id of the payment in the system
                     order_id:
-                        type: Integer
+                        type: integer
                         description: The order id of the payment in the system
                     status:
-                        type: String
+                        type: string
                         description: Describes if the payment is UNPAID, PROCESSING, or PAID
                     method_id:
-                        type: Integer
+                        type: integer
                         description: The method id of the payment in the system
         404:
             description: Payment not found
@@ -176,7 +194,6 @@ def update_payment(id):
     """
     Update a Payment
     This endpoint will update a payment based on the body that is posted
-
     ---
     tags:
         - Payments
@@ -188,29 +205,51 @@ def update_payment(id):
         - name: id
           in: path
           description: ID of payment to retrieve
-          type: Integer
+          type: integer
           required: true
+        - name: user_id
+          in: path
+          description: user id of payment in the system
+          type: integer
+          required: true
+        - name: order_id
+          in: path
+          description: order id of payment in the system
+          type: integer
+          required: true
+        - name: status
+          in: path
+          description: ID of payment to retrieve
+          type: integer
+          required: true
+        - name: method_id
+          in: path
+          description: ID of payment to retrieve
+          type: integer
+          required: true
+
+
     responses:
         200:
             description: Payment updated
             schema:
                 id: Payment
                 properties:
-                id:
-                    type: Integer
-                    description: Unique id assigned internally by service
-                user_id:
-                    type: Integer
-                    description: The user id of the payment in the system
-                order_id:
-                    type: Integer
-                    description: The order id of the payment in the system
-                status:
-                    type: String
-                    description: Describes if the payment is UNPAID, PROCESSING, or PAID
-                method_id:
-                    type: Integer
-                    description: The method id of the payment in the system
+                    id:
+                        type: integer
+                        description: Unique id assigned internally by service
+                    user_id:
+                        type: integer
+                        description: The user id of the payment in the system
+                    order_id:
+                        type: integer
+                        description: The order id of the payment in the system
+                    status:
+                        type: string
+                        description: Describes if the payment is UNPAID, PROCESSING, or PAID
+                    method_id:
+                        type: integer
+                        description: The method id of the payment in the system
         400:
             description: Bad Request
     """
@@ -229,7 +268,7 @@ def create_payment():
     """
     Create a payment
     This endpoint will create a payment based on the data in the body that is posted.
-    --
+    ---
     tags:
         - Payments
     consumes:
@@ -238,15 +277,24 @@ def create_payment():
         - application/json
     parameters:
         - in: body
-          name: body
+          user_id: body
+          required: true
+        - in: body
+          order_id: body
+          required: true
+        - in: body
+          status: body
+          required: true
+        - in: body
+          method_id: body
           required: true
           schema:
             id: data
             required:
-                - user id
-                - order id
+                - user_id
+                - order_id
                 - status
-                - method id
+                - method_id
             responses:
                 201:
                     description: Payment created
@@ -254,19 +302,19 @@ def create_payment():
                         id: Payment
                         properties:
                             id:
-                                type: Integer
+                                type: integer
                                 description: unique id assigned internally be service
-                            user id:
-                                type: Integer
+                            user_id:
+                                type: integer
                                 description: The user id of the payment in the system
-                            order id:
-                                type: Integer
+                            order_id:
+                                type: integer
                                 description: The order id of the payment in the system
                             status:
-                                type: String
+                                type: string
                                 description: Describes if the payment is UNPAID, PROCESSING, or PAID
-                            method id:
-                                type: Integer
+                            method_id:
+                                type: integer
                                 description: The method id of the payment in the system
                 400:
                     description: Bad Request
@@ -286,16 +334,16 @@ def delete_payment(id):
     """
     Delete a Payment
     This endpoint will delete a Payment based on the id specified in the path.
-    --
+    ---
     tags:
         - Payments
     description: Deletes a Payment from the database
     parameters:
-        name: id
+      - name: id
         in: path
-        description: id of payment to delete
-        type: Integer
-        required: True
+        description: ID of payment to delete
+        type: integer
+        required: true
     responses:
         204:
             description: Payment deleted
@@ -314,12 +362,10 @@ def list_payment_methods():
     """
     Retrieve a list of payment methods.
     This endpoint will return all payment methods unless a query parameter is specified.
-
-    --
+    ---
     tags:
-        - Payments
+      - Payment Methods
     description: The methods endpoint allows you to query methods
-    parameters:
     responses:
         200:
             description: An array of Payment methods
@@ -327,23 +373,21 @@ def list_payment_methods():
                 type: array
                 items:
                     schema:
-                        id: Payment
+                        id: PaymentMethod
                         properties:
                             id:
-                                type: Integer
+                                type: integer
                                 description: unique id assigned internally be service
-                            user id:
-                                type: Integer
-                                description: The user id of the payment in the system
-                            order id:
-                                type: Integer
-                                description: The order id of the payment in the system
-                            status:
-                                type: String
-                                description: Describes if the payment is UNPAID, PROCESSING, or PAID
-                            method id:
-                                type: Integer
-                                description: The method id of the payment in the system
+                            method_type:
+                                type: string
+                                description: The type of payment method
+                                enum:
+                                - CREDIT
+                                - DEBIT
+                                - PAYPAL
+                            is_default:
+                                type: boolean
+                                description: Signals that this is the default payment method
     """
 
     payment_methods = PaymentMethod.all()
@@ -356,42 +400,38 @@ def list_payment_methods():
 @app.route('/payments/methods/<int:id>', methods=['GET'])
 def get_payment_method(id):
     """
-
     Retrieve a single payment method
     This endpoint will return a Payment method based on its id
-
-    --
+    ---
     tags:
-        - Payments
+        - Payment Methods
     produces:
         - application/json
     parameters:
         - name: id
           in: path
           description: ID of payment method to retrieve
-          type: Integer
+          type: integer
           required: true
     responses:
         200:
             description: Payment method returned
             schema:
-                id: Payment
+                id: PaymentMethod
                 properties:
                     id:
-                        type: Integer
+                        type: integer
                         description: unique id assigned internally be service
-                    user id:
-                        type: Integer
-                        description: The user id of the payment in the system
-                    order id:
-                        type: Integer
-                        description: The order id of the payment in the system
-                    status:
-                        type: String
-                        description: Describes if the payment is UNPAID, PROCESSING, or PAID
-                    method id:
-                        type: Integer
-                        description: The method id of the payment in the system
+                    method_type:
+                        type: string
+                        description: The type of payment method
+                        enum:
+                        - CREDIT
+                        - DEBIT
+                        - PAYPAL
+                    is_default:
+                        type: boolean
+                        description: Signals that this is the default payment method
         404:
             description: Payment method not found
     """
@@ -407,10 +447,9 @@ def update_payment_method(id):
     """
     Update a payment method
     This endpoint will update a payment method based on the id that is posted.
-
-    --
+    ---
     tags:
-        - Payments
+        - Payment Methods
     consumes:
         - application/json
     produces:
@@ -421,27 +460,36 @@ def update_payment_method(id):
           description: id of payment method to retrieve
           type: integer
           required: true
+        - name: method_type
+          in: path
+          description: type of payment method
+          type: string
+          required: true
+        - name: is_default
+          in: path
+          description: specifies whether payment method is default
+          type: string
+          required: true
+
     responses:
         200:
             description: Payment method updated
             schema:
-                id: Payment
+                id: PaymentMethod
                 properties:
                     id:
-                        type: Integer
-                        description: unique id assigned internally by Service
-                    user id:
                         type: integer
-                        description: The user id of the payment in the system
-                    order id:
-                        type: integer
-                        description: The order id of the payment in the system
-                    status:
-                        type: String
-                        description: Describes if the payment is UNPAID, PROCESSING, or PAID
-                    method id:
-                        type: integer
-                        description: The method id of the payment in the system
+                        description: unique id assigned internally by service
+                    method_type:
+                        type: string
+                        description: The type of payment method
+                        enum:
+                        - CREDIT
+                        - DEBIT
+                        - PAYPAL
+                    is_default:
+                        type: boolean
+                        description: Signals that this is the default payment method
         400:
             description: Bad Request
     """
@@ -460,50 +508,58 @@ def create_payment_method():
     """
     Make a new payment method.
     This endpoint will make a payment method.
-
-    --
+    ---
     tags:
-        - Payments
+        - Payment Methods
     consumes:
         - application/json
     produces:
         - application/json
     parameters:
         - in: body
-          name: body
-          required: True
+          method_type: body
+          required: true
+        - in: body
+          is_default: body
+          required: true
           schema:
             id: data
             required:
-                 - user id
-                 - order id
-                 - status
-                 - method id
+                 - method_type
+                 - is_default
             properties:
-                user_id:
-                    type: Integer
-                    description: The user id of the payment in the system
-                order_id:
+                id:
                     type: integer
-                    description: The order id of the payment in the system
-                status:
-                    type: String
-                    description: Describes if the payment is UNPAID, PROCESSING, or PAID
-                method_id:
-                    type: Integer
-                    description: The method id of the payment in the system
+                    description: unique id assigned internally by service
+                method_type:
+                    type: string
+                    description: The type of payment method
+                    enum:
+                        - CREDIT
+                        - DEBIT
+                        - PAYPAL
+                is_default:
+                    type: boolean
+                    description: Signals that this is the default payment method
     responses:
         201:
             description: Payment method created
             schema:
-                id: Payment
+                id: PaymentMethod
                 properties:
                     id:
-                        type:
-                        description:
-                    name:
-
-
+                        type: integer
+                        description: unique id assigned internally be service
+                    method_type:
+                        type: string
+                        description: The type of payment method
+                        enum:
+                        - CREDIT
+                        - DEBIT
+                        - PAYPAL
+                    is_default:
+                        type: boolean
+                        description: Signals that this is the default payment method
 
     """
     pm = PaymentMethod()
@@ -520,20 +576,19 @@ def delete_payment_method(id):
     """
     Delete a payment method
     This endpoint will delete a payment method based on the id specified in its path.
-
-    --
+    ---
     tags:
-     - Payments
-     description: Deletes a payment method from the database
-     parameters:
-        name: id
+        - Payment Methods
+    description: Deletes a payment method from the database
+    parameters:
+      - name: id
         in: path
         description: method id of payment to delete
-        type: Integer
+        type: integer
         required: true
     responses:
         204:
-            description: payment method deleted
+            description: Payment Method deleted
     """
 
     pm = PaymentMethod.find(id)
@@ -549,13 +604,36 @@ def set_payment_method_default(id):
     """
     Set a default payment method.
     This endpoint will set a default payment method.
-
+    ---
     tags:
-    - Payments
-    description: Creates a default payment method.
+        - Payment Methods
+    description: Set a payment method as the default
+    parameters:
+      - name: id
+        in: path
+        description: method id of payment to make default
+        type: integer
+        required: true
     responses:
         200:
-            Default payment method created.
+            description: Payment method set to default
+            schema:
+                id: PaymentMethod
+                properties:
+                    id:
+                        type: integer
+                        description: unique id assigned internally be service
+                    method_type:
+                        type: string
+                        description: The type of payment method
+                        enum:
+                        - CREDIT
+                        - DEBIT
+                        - PAYPAL
+                    is_default:
+                        type: boolean
+                        description: Signals that this is the default payment method
+
     """
     pm = PaymentMethod.find_or_404(id)
     pm.set_default()
