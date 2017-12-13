@@ -109,3 +109,17 @@ class TestModels(unittest.TestCase):
         p1.set_default()
         self.assertTrue(p1.is_default)
         self.assertFalse(p2.is_default)
+
+    def test_recreate_table(self):
+        """A test recreate table"""
+        payment = Payment(user_id=0, order_id=0, status=PaymentStatus.UNPAID,
+            method_id=0)
+        self.assertTrue(payment != None)
+        payment.save()
+        self.assertEqual(payment.id, 1)
+        # This should be the only payment in the database, sqlite starts primary keys at 1
+        p = Payment.find(1)
+        self.assertEqual(p, payment)
+        Payment.remove_all();
+        p = Payment.find(1)
+        self.assertNotEqual(p, payment)
