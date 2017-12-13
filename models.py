@@ -40,6 +40,14 @@ class Payment(db.Model):
         db.session.commit()
 
     @staticmethod
+    def remove_all():
+        """ Removes all Pets from the database """
+        #db.drop_all();
+      #  db.create_all();
+        Payment.query.delete()
+        db.session.commit()
+
+    @staticmethod
     def all():
         """ Return all of the Payments in the database """
         return Payment.query.all()
@@ -83,7 +91,7 @@ class Payment(db.Model):
         except KeyError as e:
             raise DataValidationError('Invalid payment: missing ' + e.args[0])
         except (TypeError, ValueError) as e:
-            raise DataValidationError('Invalid payment: body of request contained bad or no data')
+            raise DataValidationError('Invalid payment: body of request contained bad or no data: %s' % e.message)
         return self
 
 

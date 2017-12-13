@@ -64,6 +64,7 @@ def home():
 ######################################################################
 @app.errorhandler(DataValidationError)
 def request_validation_error(e):
+    #print "error: %s" % e.message
     return make_response(jsonify(status=400, error='Bad Request', message=e.message), status.HTTP_400_BAD_REQUEST)
 
 
@@ -321,6 +322,7 @@ def create_payment():
         """
 
     payment = Payment()
+    print request.get_json()
     payment.deserialize(request.get_json())
     payment.save()
     message = payment.serialize()
@@ -352,6 +354,15 @@ def delete_payment(id):
     payment = Payment.find(id)
     if payment:
         payment.delete()
+    return make_response('', status.HTTP_204_NO_CONTENT)
+
+######################################################################
+# DELETE ALL PAYMENT DATA (for testing only)
+######################################################################
+@app.route('/payments/reset', methods=['DELETE'])
+def payments_reset():
+    """ Removes all payments from the database """
+    Payment.remove_all()
     return make_response('', status.HTTP_204_NO_CONTENT)
 
 ######################################################################
