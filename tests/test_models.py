@@ -57,7 +57,7 @@ class TestModels(unittest.TestCase):
 #       self.assertIsNot(p, None)
 #       self.assertEqual(p.id, 2)
 #       self.assertEqual(p.user_id, 2)
-        self.assertEqual(p.order_id, 2)
+#       self.assertEqual(p.order_id, 2)
         self.assertEqual(p.status, PaymentStatus.PAID)
 
     def test_find_payment_by_user(self):
