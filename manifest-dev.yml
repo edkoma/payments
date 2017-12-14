@@ -1,0 +1,14 @@
+---
+# This manifest deploys a Python Flask application with a ClearDB database
+applications:
+- name: nyu-payment-service-f17-dev
+  #random-route: true
+  host: nyu-payment-service-f17-dev
+  domain: mybluemix.net
+  path: .
+  instances: 2
+  memory: 64M
+  disk_quota: 512M
+  buildpack: python_buildpack
+  services:
+  - ClearDB
