@@ -12,6 +12,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 import server
+from models import PaymentStatus
+from models import PaymentMethodType
 
 WAIT_SECONDS = 30
 BASE_URL = getenv('BASE_URL', 'http://localhost:5000')
@@ -62,6 +64,43 @@ def step_impl(context, name):
         expected_conditions.text_to_be_present_in_element(
             (By.ID, 'search_results'),
             name
+        )
+    )
+    expect(found).to_be(True)
+
+@when(u'I set the "{element_name}" to "{text_string}"')
+def step_impl(context, element_name, text_string):
+    element_id = 'payment_' + element_name.lower()
+    element = context.driver.find_element_by_id(element_id)
+    element.clear()
+    element.send_keys(text_string)
+
+@when(u'I set the status option to "{text_string}"')
+def step_impl(context, text_string):
+    element_id = 'payment_status'
+    element = context.driver.find_element_by_id(element_id)
+    for option in element.find_elements_by_tag_name('option'):
+        if option.text == PaymentStatus(int(text_string)).name:
+            option.click() # select() in earlier versions of webdriver
+            break
+
+@when(u'I set the method_id option to "{text_string}"')
+def step_impl(context, text_string):
+    element_id = 'payment_method_id'
+    element = context.driver.find_element_by_id(element_id)
+    for option in element.find_elements_by_tag_name('option'):
+        if option.text == PaymentMethodType(int(text_string)).name:
+            option.click() # select() in earlier versions of webdriver
+            break
+
+@then(u'I should see the message "{message}"')
+def step_impl(context, message):
+    #element = context.driver.find_element_by_id('flash_message')
+    #expect(element.text).to_contain(message)
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'flash_message'),
+            message
         )
     )
     expect(found).to_be(True)
