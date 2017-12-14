@@ -54,11 +54,11 @@ class TestModels(unittest.TestCase):
         Payment(user_id=2, order_id=2, status=PaymentStatus.PAID,
             method_id=2).save()
         p = Payment.find(2)
-#       self.assertIsNot(p, None)
-#       self.assertEqual(p.id, 2)
-#       self.assertEqual(p.user_id, 2)
-#       self.assertEqual(p.order_id, 2)
-#       self.assertEqual(p.status, PaymentStatus.PAID)
+        self.assertIsNot(p, None)
+        self.assertEqual(p.id, 2)
+        self.assertEqual(p.user_id, 2)
+        self.assertEqual(p.order_id, 2)
+        self.assertEqual(p.status, PaymentStatus.PAID)
 
     def test_find_payment_by_user(self):
         """Find a payment by its user ID"""
