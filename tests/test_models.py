@@ -69,7 +69,7 @@ class TestModels(unittest.TestCase):
             method_id=2).save()
         p = Payment.find_by_user(2).first()
         self.assertIsNot(p, None)
-#       self.assertEqual(p.id, 2)
+        self.assertEqual(p.id, 2)
         self.assertEqual(p.user_id, 2)
         self.assertEqual(p.order_id, 2)
         self.assertEqual(p.status, PaymentStatus.PAID)
@@ -83,7 +83,7 @@ class TestModels(unittest.TestCase):
             method_id=1).save()
         p = Payment.find_by_order(2).first()
         self.assertIsNot(p, None)
-#        self.assertEqual(p.id, 2)
+        self.assertEqual(p.id, 2)
         self.assertEqual(p.user_id, 2)
         self.assertEqual(p.order_id, 2)
         self.assertEqual(p.status, PaymentStatus.PAID)
@@ -93,10 +93,10 @@ class TestModels(unittest.TestCase):
         PaymentMethod(method_type=PaymentMethodType.CREDIT).save()
         PaymentMethod(method_type=PaymentMethodType.DEBIT).save()
         pm = PaymentMethod.find(2)
-#       self.assertIsNot(pm, None)
-#       self.assertEqual(pm.id, 2)
-#       self.assertEqual(pm.method_type, PaymentMethodType.DEBIT)
-#       self.assertFalse(pm.is_default)
+        self.assertIsNot(pm, None)
+        self.assertEqual(pm.id, 2)
+        self.assertEqual(pm.method_type, PaymentMethodType.DEBIT)
+        self.assertFalse(pm.is_default)
 
     def test_set_default_payment_method(self):
         """Set a payment method to be the default"""
