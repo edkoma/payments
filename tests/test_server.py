@@ -3,6 +3,7 @@ import logging
 import json
 from flask_api import status    # HTTP Status Codes
 from server import Payment, PaymentStatus, PaymentMethodType, PaymentMethod, app, db
+from vcap_services import get_database_uri
 import os
 
 class TestServer(unittest.TestCase):
@@ -13,10 +14,7 @@ class TestServer(unittest.TestCase):
         app.logger.addHandler(logging.StreamHandler())
         app.logger.setLevel(logging.CRITICAL)
         # Set up the test database
-        if 'TRAVIS' in os.environ:
-            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/payments'
-        else:
-            app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:passw0rd@localhost/payments'
+        app.config['SQLALCHEMY_DATABASE_URI'] = get_database_uri()
         db.drop_all()    # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
         self.app = app.test_client()
@@ -155,7 +153,7 @@ class TestServer(unittest.TestCase):
         self.assertEqual(len(data), 1)
         query_item = data[0]
         self.assertEqual(query_item['order_id'], 2)
-        
+
     # def test_delete_payment(self):
     #     """ Delete a payment """
     #     # First insert a payment
@@ -291,4 +289,3 @@ class TestServer(unittest.TestCase):
         # Create a new payment mehtod and assert it is not the default
         resp = self.app.delete('/payments/reset', content_type='application/json')
         self.assertEquals(resp.status_code, status.HTTP_204_NO_CONTENT)
-        
