@@ -66,9 +66,10 @@ class TestModels(unittest.TestCase):
         # pm = PaymentMethod(method_type=PaymentMethodType.CREDIT)
         Payment(user_id=1, order_id=1, status=PaymentStatus.UNPAID,
             method_id=1).save()
-        Payment(user_id=2, order_id=2, status=PaymentStatus.PAID,
-            method_id=2).save()
-        p = Payment.find_by_user(2).first()
+        second_payment = Payment(user_id=2, order_id=2, status=PaymentStatus.PAID,
+            method_id=2)
+        second_payment.save()
+        p = Payment.find_by_user(second_payment.user_id).first()
         self.assertIsNot(p, None)
         self.assertEqual(p.id, 2)
         self.assertEqual(p.user_id, 2)
@@ -80,9 +81,10 @@ class TestModels(unittest.TestCase):
         # pm = PaymentMethod(method_type=PaymentMethodType.CREDIT)
         Payment(user_id=1, order_id=1, status=PaymentStatus.UNPAID,
             method_id=1).save()
-        Payment(user_id=2, order_id=2, status=PaymentStatus.PAID,
-            method_id=1).save()
-        p = Payment.find_by_order(2).first()
+        second_payment = Payment(user_id=2, order_id=2, status=PaymentStatus.PAID,
+            method_id=1)
+        second_payment.save()
+        p = Payment.find_by_order(second_payment.order_id).first()
         self.assertIsNot(p, None)
         self.assertEqual(p.id, 2)
         self.assertEqual(p.user_id, 2)
@@ -92,8 +94,9 @@ class TestModels(unittest.TestCase):
     def test_find_payment_method(self):
         """Find a Payment Method by ID """
         PaymentMethod(method_type=PaymentMethodType.CREDIT).save()
-        PaymentMethod(method_type=PaymentMethodType.DEBIT).save()
-        pm = PaymentMethod.find(2)
+        second_paymentmethod = PaymentMethod(method_type=PaymentMethodType.DEBIT)
+        second_paymentmethod.save()
+        pm = PaymentMethod.find(second_paymentmethod.id)
         self.assertIsNot(pm, None)
         self.assertEqual(pm.id, 2)
         self.assertEqual(pm.method_type, PaymentMethodType.DEBIT)
