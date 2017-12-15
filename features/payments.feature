@@ -31,3 +31,35 @@ Scenario: Create a Payment
     And I press the "Create" button
     Then I should see the message "Success"
 
+Scenario: Update an existing payment
+    When I visit the "Home Page"
+    And I set the "id" to "2"
+    And I press the "retrieve" button
+    Then I should see "6" in the "user_id" field
+    When I change "user_id" to "8"
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I set the "id" to "2"
+    And I press the "Retrieve" button
+    Then I should see "8" in the "user_id" field
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see user_id "8" in the results
+
+
+  Scenario: Query an existing payment
+    When I visit the "Home Page"
+    And I set the "id" to "2"
+    And I press the "retrieve" button
+    Then I should see "6" in the "user_id" field
+    Then I should see "9" in the "order_id" field
+    Then I should see "2" in the "status" field
+
+  Scenario: Delete an existing payment
+    When I visit the "Home Page"
+    And I set the "id" to "2"
+    And I press the "delete" button
+    And I press the "search" button
+    Then I should see the message "Success"
+    And I should see user_id "4" in the results
+    And I should see user_id "5" in the results
