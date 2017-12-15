@@ -3,7 +3,7 @@
 applications:
 - name: nyu-payment-service-f17
   #random-route: true
-  host: nyu-payment-service-f17
+  #host: nyu-payment-service-f17
   domain: mybluemix.net
   path: .
   instances: 2
