@@ -51,11 +51,12 @@ class TestModels(unittest.TestCase):
         # pm = PaymentMethod(method_type=PaymentMethodType.CREDIT)
         Payment(user_id=1, order_id=1, status=PaymentStatus.UNPAID,
             method_id=1).save()
-        Payment(user_id=2, order_id=2, status=PaymentStatus.PAID,
-            method_id=2).save()
-        p = Payment.find(2)
+        second_payment = Payment(user_id=2, order_id=2, status=PaymentStatus.PAID,
+            method_id=2)
+        second_payment.save()
+        p = Payment.find(second_payment.id)
         self.assertIsNot(p, None)
-        self.assertEqual(p.id, 2)
+        self.assertEqual(p.id, second_payment.id)
         self.assertEqual(p.user_id, 2)
         self.assertEqual(p.order_id, 2)
         self.assertEqual(p.status, PaymentStatus.PAID)
