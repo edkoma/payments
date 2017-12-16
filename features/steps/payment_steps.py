@@ -35,9 +35,10 @@ def step_impl(context):
             }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
+        expect(context.resp.status_code).to_equal(201)
         temp_resp = json.loads(context.resp.text)
         temp_id = temp_resp['id']
-        expect(context.resp.status_code).to_equal(201)
+        time.sleep(4)
     #Since sqlalchemy autoincrements the id, I am getting the  last ID and passing it the context for testing
     context.temp_id = temp_id
 
