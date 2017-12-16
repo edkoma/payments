@@ -12,8 +12,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.remote.webelement import WebElement
-from models import PaymentStatus
-from models import PaymentMethodType
 import time
 
 
@@ -87,12 +85,19 @@ def step_impl(context, element_name, text_string):
     element.clear()
     element.send_keys(text_string)
 
+def get_payment_status_name(text_string):
+    return ['UNPAID', 'PROCESSING', 'PAID'][int(text_string)-1]
+
+def get_payment_method_type_name(text_string):
+    return ['CREDIT', 'DEBIT', 'PAYPAL'][int(text_string)-1]
+
 @when(u'I set the status option to "{text_string}"')
 def step_impl(context, text_string):
     element_id = 'payment_status'
     element = context.driver.find_element_by_id(element_id)
+    name = get_payment_status_name(text_string)
     for option in element.find_elements_by_tag_name('option'):
-        if option.text == PaymentStatus(int(text_string)).name:
+        if option.text.lower() == name.lower():
             option.click() # select() in earlier versions of webdriver
             break
 
@@ -100,8 +105,9 @@ def step_impl(context, text_string):
 def step_impl(context, text_string):
     element_id = 'payment_method_id'
     element = context.driver.find_element_by_id(element_id)
+    name = get_payment_method_type_name(text_string)
     for option in element.find_elements_by_tag_name('option'):
-        if option.text == PaymentMethodType(int(text_string)).name:
+        if option.text.lower() == name.lower():
             option.click() # select() in earlier versions of webdriver
             break
 
